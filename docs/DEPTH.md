@@ -13,6 +13,7 @@
 | M5 扣回核算 | 查看并运行扣回核算 | `/api/deductions` | `app/modules/m5_deductions/rules.py` | `tests/test_m5.py` |
 | M6 进度对账 | 查看并运行进度对账 | `/api/valuation` | `app/modules/m6_valuation/rules.py` | `tests/test_m6.py` |
 | M7 签证归档 | 查看并运行签证归档 | `/api/certificates` | `app/modules/m7_certificates/rules.py` | `tests/test_m7.py` |
+| M8 计量工作台 | 核对本月签认量、换算依据与前期衔接 | `/api/measurement` | `app/modules/m8_measurement/rules.py` | `tests/test_m8.py` |
 
 ## 陷阱登记
 
@@ -30,6 +31,11 @@
 | TRAP-07 | 累计量空值 | 按零冲回 | 隔离缺失 | `app/values.py` | `tests/test_m2.py::test_real_null_not_zero` |
 | TRAP-10 | 分币舍入 | 浮点误差 | 分项量化后净额守恒 | `app/modules/m5_deductions/rules.py` | `tests/test_m5.py::test_fraction_rounds_to_cent` |
 | TRAP-23 | 变更生效边界 | 旧价覆盖 | 按周期选择已批版本 | `app/modules/m3_changes/rules.py` | `tests/test_m3.py::test_effective_boundary` |
+| TRAP-31 | 系数切换重算历史 | 全链按新系数折吨，已签证月跳量 | 签证锚点冻结，冻结月只沿用上一版或封存台账 | `app/modules/m8_measurement/rules.py` | `tests/test_m8.py::test_frozen_month_keeps_previous_factor` |
+| TRAP-32 | 吨千克混用 | 单位混加或忽略原单位 | 逐行留痕原单位，kg按当月kg_per_t折吨、t/m³直计 | `app/modules/m8_measurement/rules.py` | `tests/test_m8.py::test_current_month_uses_latest_factor` |
+| TRAP-33 | 签证吨数金额被改写 | 新系数覆盖审计封存值 | certified_ledger原样沿用，不参与任何重算 | `app/modules/m8_measurement/rules.py` | `tests/test_m8.py::test_sealed_certificate_tonnage_and_amount_frozen` |
+| TRAP-34 | 依据切换失败中断计量 | 报错停批或沿用无依据结果 | 回退上一版依据并标记fallback，双失败才隔离 | `app/modules/m8_measurement/rules.py` | `tests/test_m8.py::test_basis_switch_failure_falls_back_to_previous` |
+| TRAP-35 | 同一依据重试重复换算 | 每次重试再做除法产生舍入漂移 | 上下文换算台账按来源行+依据版本幂等复用 | `app/modules/m8_measurement/rules.py` | `tests/test_m8.py::test_same_basis_retry_uses_ledger_once` |
 
 ## 对账规则
 

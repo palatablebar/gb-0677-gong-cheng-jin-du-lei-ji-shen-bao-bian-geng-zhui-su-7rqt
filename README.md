@@ -20,10 +20,13 @@ docker compose exec -T app pytest -q
 - 5. 扣回核算：`/deductions`，`/api/deductions`。
 - 6. 进度对账：`/valuation`，`/api/valuation`。
 - 7. 签证归档：`/certificates`，`/api/certificates`。
+- 8. 计量工作台：`/measurement`，`/api/measurement`。
 
 ## 核心规则
 
 累计申报必须减前期已审金额，变更按审批生效版本覆盖；负进度需关联冲回证据。
+
+计量工作台处理吨/千克双单位与按月调整的换算系数：已签证月份按锚点冻结，只沿用上一版依据或封存台账，吨数与金额不重算；本月新增量才按最新依据折吨，累计链逐行承接不跳量。依据切换失败回退上一版并留痕，同一依据重试经换算台账幂等复用、不重复换算。
 
 ## 演示
 
